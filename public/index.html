@@ -1,392 +1,394 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>FIDO2 デモサイト</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIDO2 WebAuthn デモ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --body-bg: #ffffff;
+            --body-color: #212529;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+        }
 
-    :root {
-      --primary-color: #667eea;
-      --secondary-color: #764ba2;
-      --success-color: #28a745;
-      --error-color: #dc3545;
-      --warning-color: #ffc107;
-      --info-color: #17a2b8;
-      --text-color: #333;
-      --bg-color: #fff;
-      --border-color: #e1e5e9;
-      --shadow-color: rgba(0, 0, 0, 0.1);
-    }
+        [data-theme="dark"] {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0;
+            --light-color: #212529;
+            --dark-color: #f8f9fa;
+            --body-bg: #121212;
+            --body-color: #e9ecef;
+            --card-bg: #1e1e1e;
+            --border-color: #495057;
+        }
 
-    [data-theme="dark"] {
-      --text-color: #e1e5e9;
-      --bg-color: #1a1a1a;
-      --border-color: #404040;
-      --shadow-color: rgba(0, 0, 0, 0.3);
-    }
+        body {
+            background-color: var(--body-bg);
+            color: var(--body-color);
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      color: var(--text-color);
-      transition: all 0.3s ease;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    .container {
-      background: var(--bg-color);
-      border-radius: 20px;
-      box-shadow: 0 20px 40px var(--shadow-color);
-      padding: 40px;
-      max-width: 600px;
-      width: 100%;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
 
-    .logo {
-      font-size: 2.5em;
-      font-weight: bold;
-      color: var(--text-color);
-    }
+        .btn {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .theme-toggle {
-      background: none;
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      width: 32px;
-      height: 32px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-color);
-    }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
 
-    .theme-toggle:hover {
-      transform: scale(1.05);
-      background: var(--border-color);
-    }
+        .btn:hover::before {
+            left: 100%;
+        }
 
-    .subtitle {
-      color: var(--text-color);
-      opacity: 0.7;
-      margin-bottom: 30px;
-      font-size: 1.1em;
-    }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), #0056b3);
+            color: white;
+        }
 
-    .form-group {
-      margin-bottom: 25px;
-      text-align: left;
-    }
+        .btn-success {
+            background: linear-gradient(45deg, var(--success-color), #1e7e34);
+            color: white;
+        }
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--text-color);
-      font-weight: 500;
-    }
+        .btn-danger {
+            background: linear-gradient(45deg, var(--danger-color), #c82333);
+            color: white;
+        }
 
-    input[type="text"] {
-      width: 100%;
-      padding: 15px;
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      background: var(--bg-color);
-      color: var(--text-color);
-    }
+        .btn-warning {
+            background: linear-gradient(45deg, var(--warning-color), #e0a800);
+            color: #212529;
+        }
 
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            padding: 12px 15px;
+            background-color: var(--card-bg);
+            color: var(--body-color);
+            transition: all 0.3s ease;
+        }
 
-    .button-group {
-      display: flex;
-      gap: 15px;
-      margin-top: 30px;
-      flex-wrap: wrap;
-    }
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            background-color: var(--card-bg);
+            color: var(--body-color);
+        }
 
-    button:not(.theme-toggle) {
-      flex: 1;
-      min-width: 120px;
-      padding: 15px 25px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 15px 20px;
+            margin: 15px 0;
+        }
 
-    .btn-register {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      color: white;
-    }
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
 
-    .btn-login {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-    }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    button:not(.theme-toggle):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px var(--shadow-color);
-    }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
 
-    button:not(.theme-toggle):active {
-      transform: translateY(0);
-    }
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
 
-    button:not(.theme-toggle):disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background-color: var(--border-color);
+        }
 
-    .status {
-      margin-top: 25px;
-      padding: 15px;
-      border-radius: 10px;
-      font-weight: 500;
-      animation: slideIn 0.3s ease;
-    }
+        .progress-bar {
+            border-radius: 10px;
+            background: linear-gradient(45deg, var(--primary-color), #0056b3);
+        }
 
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+        .authenticator-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
 
-    .success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
+        .authenticator-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
 
-    .error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
+        .authenticator-item:hover {
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+        }
 
-    .warning {
-      background: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeaa7;
-    }
+        .user-suggestion {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    .info {
-      background: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-      margin-top: 20px;
-      font-size: 0.9em;
-      line-height: 1.5;
-    }
+        .user-suggestion:hover {
+            background: var(--primary-color);
+            color: white;
+        }
 
-    .loading {
-      display: none;
-      margin-top: 20px;
-      text-align: center;
-    }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
 
-    .progress-container {
-      width: 100%;
-      background: var(--border-color);
-      border-radius: 10px;
-      margin: 20px 0;
-      overflow: hidden;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .progress-bar {
-      height: 6px;
-      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-      border-radius: 10px;
-      transition: width 0.3s ease;
-      animation: progressPulse 2s infinite;
-    }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
 
-    @keyframes progressPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
 
-    .spinner {
-      border: 3px solid var(--border-color);
-      border-top: 3px solid var(--primary-color);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 10px;
-    }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+        .status-success { background-color: var(--success-color); }
+        .status-error { background-color: var(--danger-color); }
+        .status-warning { background-color: var(--warning-color); }
+        .status-info { background-color: var(--info-color); }
 
-    .step-indicator {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-      gap: 10px;
-    }
-
-    .step {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--border-color);
-      transition: all 0.3s ease;
-    }
-
-    .step.active {
-      background: var(--primary-color);
-      transform: scale(1.2);
-    }
-
-    .step.completed {
-      background: var(--success-color);
-    }
-
-    #credentials-section {
-      margin-top: 30px;
-      padding: 20px;
-      background: var(--bg-color);
-      border-radius: 15px;
-      border: 1px solid var(--border-color);
-    }
-
-    #credentials-section h3 {
-      margin-bottom: 20px;
-      color: var(--text-color);
-    }
-
-    .credential-item {
-      background: var(--bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.3s ease;
-    }
-
-    .credential-item:hover {
-      box-shadow: 0 5px 15px var(--shadow-color);
-      transform: translateY(-2px);
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 30px 20px;
-      }
-      
-      .button-group {
-        flex-direction: column;
-      }
-
-      .header {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .logo {
-        font-size: 2em;
-      }
-
-      .theme-toggle {
-        width: 28px;
-        height: 28px;
-        font-size: 0.9em;
-      }
-    }
-  </style>
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="logo">🔐 FIDO2</div>
-      <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-    </div>
-    <div class="subtitle">WebAuthn デモサイト</div>
-    
-    <div class="form-group">
-      <label for="username">ユーザー名</label>
-      <input type="text" id="username" placeholder="ユーザー名を入力してください" autocomplete="username webauthn">
+    <div class="theme-toggle" onclick="toggleTheme()" title="テーマ切り替え">
+        <i class="fas fa-moon" id="theme-icon"></i>
     </div>
 
-    <div class="button-group">
-      <button id="register" class="btn-register">登録</button>
-      <button id="login" class="btn-login">認証</button>
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-4 mb-3">
+                <i class="fas fa-shield-alt text-primary"></i>
+                FIDO2 WebAuthn デモ
+            </h1>
+            <p class="lead text-muted">
+                パスワードレス認証でセキュアな未来を体験
+            </p>
+        </div>
+
+        <div class="row">
+            <!-- 登録セクション -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-plus"></i>
+                            アカウント登録
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="registrationForm">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">ユーザー名</label>
+                                <input type="text" class="form-control" id="username" placeholder="ユーザー名を入力" required>
+                                <div id="userSuggestions" class="mt-2"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="displayName" class="form-label">表示名</label>
+                                <input type="text" class="form-control" id="displayName" placeholder="表示名を入力" required>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" id="registerBtn">
+                                    <i class="fas fa-user-plus"></i>
+                                    登録
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 認証セクション -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-sign-in-alt"></i>
+                            認証
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="authenticationForm">
+                            <div class="mb-3">
+                                <label for="authUsername" class="form-label">ユーザー名（オプション）</label>
+                                <input type="text" class="form-control" id="authUsername" placeholder="ユーザー名を入力（空欄でパスキー選択）">
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success" id="authenticateBtn">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    認証
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 認証器管理セクション -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-key"></i>
+                            認証器管理
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>登録済み認証器</h6>
+                                <div id="authenticatorList" class="authenticator-list">
+                                    <p class="text-muted">認証器が登録されていません</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>認証器追加</h6>
+                                <form id="addAuthenticatorForm">
+                                    <div class="mb-3">
+                                        <label for="addUsername" class="form-label">ユーザー名</label>
+                                        <input type="text" class="form-control" id="addUsername" placeholder="ユーザー名を入力" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="addDisplayName" class="form-label">表示名</label>
+                                        <input type="text" class="form-control" id="addDisplayName" placeholder="表示名を入力" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="fas fa-plus"></i>
+                                        認証器追加
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 進捗表示 -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
+            <p class="text-center mt-2" id="progressText">処理中...</p>
+        </div>
+
+        <!-- メッセージ表示エリア -->
+        <div id="messageArea"></div>
     </div>
 
-    <div id="credentials-section" style="display: none;">
-      <h3>登録済み認証器</h3>
-      <div id="credentials-list"></div>
-      <button id="add-credential" class="btn-register" style="margin-top: 15px;">認証器を追加</button>
-    </div>
-
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-      <p>処理中...</p>
-      <div class="progress-container">
-        <div class="progress-bar" style="width: 0%"></div>
-      </div>
-      <div class="step-indicator">
-        <div class="step active"></div>
-        <div class="step"></div>
-        <div class="step"></div>
-      </div>
-    </div>
-
-    <div id="result" class="status" style="display: none;"></div>
-    <div id="error" class="status" style="display: none;"></div>
-
-    <div class="info">
-      <strong>FIDO2とは？</strong><br>
-      パスワードレス認証の国際標準規格です。<br>
-      生体認証やセキュリティキーを使用して安全にログインできます。<br><br>
-      <strong>💡 パスキー機能</strong><br>
-      • ユーザー名入力欄にフォーカスすると、登録済みのパスキーが自動的に表示されます<br>
-      • ユーザー名を入力せずに「認証」ボタンを押すと、登録済みのアカウントから選択できます
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/@simplewebauthn/browser@8.3.4/dist/index.umd.js"></script>
+    <script src="script.js"></script>
 </body>
 </html> 
