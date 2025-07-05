@@ -125,16 +125,6 @@ fido2-webauthn-demo/
 4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
 5. プルリクエストを作成
 
-## 📄 ライセンス
-
-MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照
-
-## 🙏 謝辞
-
-- [@simplewebauthn](https://github.com/MasterKale/SimpleWebAuthn) チーム
-- FIDO Alliance
-- WebAuthn コミュニティ
-
 ---
 
 **⚠️ 注意**: このデモは学習・検証用途です。本番環境での使用には適切なセキュリティ対策を実装してください。 
