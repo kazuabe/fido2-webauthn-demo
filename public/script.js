@@ -201,21 +201,40 @@ async function deleteCredential(username, index) {
 }
 
 // 認証器追加ボタンの処理
-document.getElementById('add-credential').onclick = async () => {
-  const username = document.getElementById('username').value;
-  if (!username) {
-    showMessage('error', 'ユーザー名を入力してください', 'error');
-    return;
+// document.getElementById('add-credential').onclick = async () => {
+//   const username = document.getElementById('username').value;
+//   if (!username) {
+//     showMessage('error', 'ユーザー名を入力してください', 'error');
+//     return;
+//   }
+//   // 登録処理を実行
+//   await performRegistration();
+//   // 登録完了後に認証器一覧を更新
+//   setTimeout(() => {
+//     loadCredentials(username);
+//   }, 1000);
+// };
+
+// 登録ボタンの処理（registerBtnに対応）
+document.addEventListener('DOMContentLoaded', () => {
+  // 登録ボタン
+  const registerBtn = document.getElementById('registerBtn');
+  if (registerBtn) {
+    registerBtn.onclick = async (e) => {
+      e.preventDefault();
+      await performRegistration();
+    };
   }
-  
-  // 登録処理を実行
-  await performRegistration();
-  
-  // 登録完了後に認証器一覧を更新
-  setTimeout(() => {
-    loadCredentials(username);
-  }, 1000);
-};
+
+  // 認証ボタン
+  const authenticateBtn = document.getElementById('authenticateBtn');
+  if (authenticateBtn) {
+    authenticateBtn.onclick = async (e) => {
+      e.preventDefault();
+      await performAuthentication();
+    };
+  }
+});
 
 // 登録処理（統合版）
 async function performRegistration() {
